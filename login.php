@@ -17,7 +17,7 @@
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg secondary-bg-color navbar-dark py-3 sticky-top">
             <div class="container">
-                <a href="/PWebCInt/landing.php" class="navbar-brand">Compras <span class="text-warning">MX</span></a>
+                <a href="/PWebCInt/index.php" class="navbar-brand">Compras <span class="text-warning">MX</span></a>
 
                 <button class="button navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
                     <span class="navbar-toggler-icon"></span>
@@ -46,7 +46,7 @@
                             <h3 class="mb-4">Bienvenido a Compras<span class="text-warning"> MX</span></h3>
                             <img src="img/welcome-back.svg" style="width: 300px;" alt="logo" class="mb-4">
                           </div>
-                          <form method="POST" action="/PWebCInt/index.php">
+                          <form method="POST" action="/PWebCInt/home.php">
                             <div class="form-outline mb-4">
                               <label class="form-label" for="loginNombre">Nombre de Usuario: </label>
                               <input type="text" id="loginNombre" name="loginNombre" class="form-control" required>

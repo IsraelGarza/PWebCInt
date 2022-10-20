@@ -17,7 +17,7 @@
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg secondary-bg-color navbar-dark py-3 sticky-top">
             <div class="container">
-                <a href="/PWebCInt/index.php" class="navbar-brand">Compras <span class="text-warning">MX</span></a>
+                <a href="/PWebCInt/home.php" class="navbar-brand">Compras <span class="text-warning">MX</span></a>
 
                 <button class="button navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
                     <span class="navbar-toggler-icon"></span>
@@ -32,7 +32,7 @@
                             <a href="/PWebCInt/cart.php" class="nav-link">Mi Carrito <span class="badge bg-dark text-white ms-1 rounded-pill">3</span></a>
                         </li>
                         <li class="nav-item">
-                            <a href="/PWebCInt/landing.php" class="nav-link">Cerrar Sesión</a>
+                            <a href="/PWebCInt/index.php" class="nav-link">Cerrar Sesión</a>
                         </li>
                     </ul>
                 </div>

@@ -11,13 +11,15 @@
         <link rel="stylesheet" type="text/css" href="style.css">
 
         <title>Registrarse | Compras MX</title>
+
+        <style>.error {color: #FF0000;}</style>
     </head>
     <body class="bg-white bg-gradient">
 
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg secondary-bg-color navbar-dark py-3 sticky-top">
             <div class="container">
-                <a href="/PWebCInt/landing.php" class="navbar-brand">Compras <span class="text-warning">MX</span></a>
+                <a href="/PWebCInt/index.php" class="navbar-brand">Compras <span class="text-warning">MX</span></a>
 
                 <button class="button navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
                     <span class="navbar-toggler-icon"></span>
@@ -33,6 +35,88 @@
             </div>
         </nav>
 
+        <?php
+        // define variables and set to empty values
+        $nombreErr = $apellidoErr = $fechaErr = $correoErr = $usernameErr = $passwordErr = $userTypeErr = "";
+        $nombre = $apellido = $fecha = $correo = $username = $password = $userType = "";
+
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+          if (empty($_POST["nombre"])) {
+            $nombreErr = "El nombre es requerido";
+          } else {
+            $nombre = test_input($_POST["nombre"]);
+            // check if name only contains letters and whitespace
+            if (!preg_match("/^[a-zA-Z-' ]*$/",$nombre)) {
+              $nombreErr = "Sólo se admiten letras y espacios en blanco";
+            }
+          }
+
+          if (empty($_POST["apellido"])) {
+            $apellidoErr = "El apellido es requerido";
+          } else {
+            $apellido = test_input($_POST["apellido"]);
+            // check if name only contains letters and whitespace
+            if (!preg_match("/^[a-zA-Z-' ]*$/",$apellido)) {
+              $apellidoErr = "Sólo se admiten letras y espacios en blanco";
+            }
+          }
+
+          if (empty($_POST["correo"])) {
+            $correoErr = "El correo es requerido";
+          } else {
+            $correo = test_input($_POST["correo"]);
+            // check if e-mail address is well-formed
+            if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+              $correoErr = "Formato de correo inválido";
+            }
+          }
+
+          if (empty($_POST["username"])) {
+            $apellidoErr = "El usuario es requerido";
+          } else {
+            $username = test_input($_POST["apellido"]);
+            // check if name only contains letters and whitespace
+            if (!preg_match("/^[a-zA-Z-']*$/",$username)) {
+              $usernameErr = "Sólo se admiten letras";
+            }
+          }
+      
+          if(!empty($_POST["password"])) {
+            $password = test_input($_POST["password"]);
+            if (strlen($_POST["password"]) <= '8') {
+                $passwordErr = "La contraseña debe tener al menos 8 dígitos";
+            }
+            elseif(!preg_match("#[0-9]+#",$password)) {
+                $passwordErr = "La contraseña debe tener al menos 1 número";
+            }
+            elseif(!preg_match("#[A-Z]+#",$password)) {
+                $passwordErr = "La contraseña debe tener al menos 1 caracter en mayúscula";
+            }
+            elseif(!preg_match("#[a-z]+#",$password)) {
+                $passwordErr = "La contraseña debe tener al menos 1 caracter en minúscula";
+            }
+           }
+           else if(!empty($_POST["password"])) {
+               $cpasswordErr = "Please Check You've Entered Or Confirmed Your Password!";
+           } else {
+                $passwordErr = "Debe de ingresar una constraseña";
+           }
+      
+          if (empty($_POST["userType"])) {
+            $userTypeErr = "Seleccione un tipo de usuario";
+          } else {
+            $userType = test_input($_POST["userType"]);
+          }
+        }
+
+        function test_input($data) {
+          $data = trim($data);
+          $data = stripslashes($data);
+          $data = htmlspecialchars($data);
+          return $data;
+        }
+        ?>
+
         <!-- Forma de Registro -->
         <section class="gradient-form">
             <div class="container py-5">
@@ -47,41 +131,56 @@
                             <div class="justify-content-center align-items-center row g-0">
                                 <div class="col-lg-8">
                                     <div class="card-body p-md-5 mx-md-4">
-                                        <form action="/Registro" method="POST" enctype="multipart/form-data">
+                                        <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" enctype="multipart/form-data">
                                             <div class="form-outline mb-4">
-                                              <label class="form-label" for="registroNombre">Nombre(s): </label>
-                                              <input type="text" id="registroNombre" name="registroNombre" class="form-control" required>
+                                              <label class="form-label" for="nombre">Nombre(s): </label>
+                                              <span class="error"> * <?php echo $nombreErr;?></span>
+                                              <input type="text" id="nombre" name="nombre" class="form-control" value="<?php echo $nombre;?>" required>
                                             </div>
                                             <div class="form-outline mb-4">
-                                                <label class="form-label" for="registroApellido">Apellidos: </label>
-                                                <input type="text" id="registroApellido" name="registroApellido" class="form-control" required>
+                                                <label class="form-label" for="apellido">Apellidos: </label>
+                                                <span class="error"> * <?php echo $apellidoErr;?></span>
+                                                <input type="text" id="apellido" name="apellido" class="form-control" value="<?php echo $apellido;?>" required>
                                             </div>
                                             <div class="form-outline mb-4">
                                                 <label class="form-label" for="fecha">Fecha de Nacimiento: </label>
-                                                <input type="date" id="fecha" name="fecha" class="form-control" required>
+                                                <input type="date" id="fecha" name="fecha" class="form-control">
                                             </div>
                                             <div class="form-outline mb-4">
                                               <label class="form-label" for="correo">Correo Electrónico: </label>
-                                              <input type="email" id="correo" name="correo" class="form-control" required>
+                                              <span class="error"> * <?php echo $correoErr;?></span>
+                                              <input type="email" id="correo" name="correo" class="form-control" value="<?php echo $correo;?>" required>
                                             </div>
                                             <div class="form-outline mb-4">
                                                 <label class="form-label" for="imagen">Imagen de Perfil: </label>
-                                                <input type="file" id="imagen" name="imagen" class="form-control" required>
+                                                <input type="file" id="imagen" name="imagen" class="form-control">
                                             </div>
                                             <div class="form-outline mb-4">
                                                 <label class="form-label" for="username">Nombre de Usuario: </label>
-                                                <input type="text" id="username" name="username" class="form-control" required>
+                                                <span class="error"> * <?php echo $usernameErr;?></span>
+                                                <input type="text" id="username" name="username" class="form-control" value="<?php echo $username;?>" required>
                                             </div>
                                             <div class="form-outline mb-4">
                                                 <label class="form-label" for="password">Contraseña: </label>
-                                                <input type="password" id="password" name="password" class="form-control" required>
+                                                <span class="error"> * <?php echo $passwordErr;?></span>
+                                                <input type="password" id="password" name="password" class="form-control" value="<?php echo $password;?>" required>
                                             </div>
                                             <div class="form-outline mb-4">
                                               <label class="form-label" for="password2">Confirmar Contraseña: </label>
                                               <input type="password" id="password2" name="password2" class="form-control" required>
                                             </div>
+                                            <p class="mb-2">Tipo de Usuario:</p>
+                                            <div class="form-check form-check-inline mb-2">
+                                                <input class="form-check-input" type="radio" name="userType" id="userType1" value="Comprador" checked>
+                                                <label class="form-check-label" for="userType1">Comprador</label>
+                                            </div>
+                                            <div class="form-check form-check-inline mb-4">
+                                                <input class="form-check-input" type="radio" name="userType" id="userType2" value="Vendedor">
+                                                <label class="form-check-label" for="userType2">Vendedor</label>
+                                            </div>
                                             <div class="text-center">
-                                              <button class="btn btn-block fa-lg btn-lg accent-bg-color mb-4" onclick="registroUsuario()" type="button">Registrarse</button>
+                                                <input class="btn btn-block fa-lg btn-lg accent-bg-color mb-4" type="submit" name="submit" value="Registrar">  
+                                                <input class="btn btn-block fa-lg btn-lg accent-bg-color mb-4" type="submit" value="Entrar" onclick="parent.location='home.php'">
                                             </div>
           
                                             <div class="d-flex align-items-center justify-content-center pb-3">
