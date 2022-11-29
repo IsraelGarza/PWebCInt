@@ -1,3 +1,48 @@
+<?php
+  function alert($msg) {
+    echo "<script type='text/javascript'>alert('$msg');</script>";
+  }
+
+  session_start();
+  if($_POST){
+
+    require "db.php";
+    $username = $_POST['loginUsername'];
+    $password = $_POST['loginPass'];
+
+    $sql = "SELECT * FROM usuarios WHERE username='$username'";
+
+    $resultado = $con->query($sql);
+    $num = $resultado->num_rows;
+
+    if($num>0){
+      $row = $resultado->fetch_assoc();
+      $password_bd = $row['pass'];
+      //$pass_c = sha1($password);
+      $pass_c = $password;
+      //echo "Comparando ${pass_c} con ${password}<br>";
+      if($password_bd == $pass_c){
+        $_SESSION['userId'] = $row['userId'];
+        $_SESSION['nombre'] = $row['nombre'];
+        $_SESSION['apellidos'] = $row['apellidos'];
+        $_SESSION['fechaNac'] = $row['fechaNac'];
+        $_SESSION['correo'] = $row['correo'];
+        $_SESSION['imagen'] = $row['imagen'];
+        $_SESSION['pass'] = $row['pass'];
+        $_SESSION['username'] = $row['username'];
+        $_SESSION['tipousuario'] = $row['tipousuario'];
+
+        header("Location: home.php");
+      } else {
+        alert("La contraseña no coincide.");
+      }
+    } else {
+      alert("No existe el usuario.");
+    }
+    mysqli_close($con);
+  }
+?>
+
 <!DOCTYPE html>
 <html lang="es-MX">
     <head>
@@ -46,17 +91,17 @@
                             <h3 class="mb-4">Bienvenido a Compras<span class="text-warning"> MX</span></h3>
                             <img src="img/welcome-back.svg" style="width: 300px;" alt="logo" class="mb-4">
                           </div>
-                          <form method="POST" action="/PWebCInt/home.php">
+                          <form method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                             <div class="form-outline mb-4">
-                              <label class="form-label" for="loginNombre">Nombre de Usuario: </label>
-                              <input type="text" id="loginNombre" name="loginNombre" class="form-control" required>
+                              <label class="form-label" for="loginUsername">Nombre de Usuario: </label>
+                              <input type="text" id="loginUsername" name="loginUsername" class="form-control" required>
                             </div>
                             <div class="form-outline">
                                 <label class="form-label" for="loginPass">Contraseña: </label>
                                 <input type="password" id="loginPass" name="loginPass" class="form-control" required>
                             </div>
                             <div class="text-center">
-                              <button class="btn btn-block fa-lg accent-bg-color my-5 px-3" type="button" onclick="getInfo()">Iniciar Sesión</button>
+                              <button class="btn btn-block fa-lg accent-bg-color my-5 px-3" type="submit" onclick="getInfo()">Iniciar Sesión</button>
                             </div>
           
                             <div class="d-flex align-items-center justify-content-center pb-5">

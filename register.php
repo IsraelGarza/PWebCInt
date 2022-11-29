@@ -1,3 +1,105 @@
+<?php
+
+  require "db.php";
+  require "funcs.php";
+  $errors = array();
+  
+  if(!empty($_POST)){
+
+    $nombre = $con->real_escape_string($_POST['nombre']);
+    $apellido = $con->real_escape_string($_POST['apellido']);
+    $fecha = $con->real_escape_string($_POST['fecha']);
+    $correo = $con->real_escape_string($_POST['correo']);
+    $imagen = $con->real_escape_string($_POST['imagen']); 
+    $username = $con->real_escape_string($_POST['username']);
+    $password = $con->real_escape_string($_POST['password']);
+    $password2 = $con->real_escape_string($_POST['password2']);
+    $tipousuario = $con->real_escape_string($_POST['tipousuario']);
+    //$captcha = $con->real_escape_string($_POST['g-captcha-response']);
+
+    //$secret = '6LdRTT0jAAAAACrhBblAS2mqOd2NKPBuOtJFmVnM';
+    $secret = '';
+    
+    if ('tipousuario' == '1') {
+      $tipousuario = 1;
+    } elseif ('tipousuario' == '2') {
+      $tipousuario = 2;
+    } elseif ('tipousuario' == '3') {
+      $tipousuario = 3;
+    }
+
+    //if (!$captcha) {
+    //  $errors[] = "Porfavor verifica el captcha.";
+    //}
+
+    if(isNull ($nombre, $apellido, $fecha, $correo, $imagen, $username, $password, $password2, $tipousuario)){
+      $errors[] = "Debe llenar todos los campos.";
+    }
+
+    if(nombreChar($nombre)){
+      $errors[] = "El nombre sólo admite letras y espacios.";
+    }
+
+    if(apellidoChar($apellido)){
+      $errors[] = "Los apellidos sólo admiten letras y espacios.";
+    }
+
+    if(!isEmail($correo)) {
+      $errors[] = "Dirección de correo inválida.";
+    }
+
+    if(validatePasswordLength($password)) {
+      $errors[] = "La contraseña debe tener al menos 8 dígitos.";
+    }
+
+    if(validatePasswordNum($password)) {
+      $errors[] = "La contraseña debe tener al menos 1 número.";
+    }
+
+    if(validatePasswordMax($password)) {
+      $errors[] = "La contraseña debe tener al menos 1 caracter en mayúscula.";
+    }
+
+    if(validatePasswordMin($password)) {
+      $errors[] = "La contraseña debe tener al menos 1 caracter en minúscula.";
+    }
+
+    if(!confirmPassword($password, $password2)) {
+      $errors[] = "Las contraseñas no coinciden.";
+    }
+    
+    if(usuarioExiste($username)){
+      $errors[] = "El nombre de usuario $usuario ya existe.";
+    }
+
+    if(correoExiste($correo)){
+      $errors[] = "El correo introducido $correo ya existe.";
+    }
+
+    if(count($errors) == 0){
+      //$response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$secret&response=$captcha");
+
+      //$arr = json_decode($response, TRUE);
+
+      //if($arr['success'])
+      //{
+        $pass_hash = hashPassword($password);
+        $registro = registrarUsuario($nombre, $apellido, $fecha, $correo, $imagen, $username, $password, $tipousuario);
+
+        if($registro > 0){
+          header("Location: login.php");
+        } else {
+          $errors[] = "Error al registrar el usuario.";
+        }
+
+      //} else {
+        //$errors[] = 'Error al comprobar Captcha';
+      //}
+    }
+    mysqli_close($con);
+  }
+?>
+
 <!DOCTYPE html>
 <html lang="es-MX">
     <head>
@@ -9,6 +111,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
         <link rel="stylesheet" type="text/css" href="style.css">
+        <script src=”http://www.google.com/recaptcha/api.js”></script>
 
         <title>Registrarse | Compras MX</title>
 
@@ -35,88 +138,6 @@
             </div>
         </nav>
 
-        <?php
-        // define variables and set to empty values
-        $nombreErr = $apellidoErr = $fechaErr = $correoErr = $usernameErr = $passwordErr = $userTypeErr = "";
-        $nombre = $apellido = $fecha = $correo = $username = $password = $userType = "";
-
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-          if (empty($_POST["nombre"])) {
-            $nombreErr = "El nombre es requerido";
-          } else {
-            $nombre = test_input($_POST["nombre"]);
-            // check if name only contains letters and whitespace
-            if (!preg_match("/^[a-zA-Z-' ]*$/",$nombre)) {
-              $nombreErr = "Sólo se admiten letras y espacios en blanco";
-            }
-          }
-
-          if (empty($_POST["apellido"])) {
-            $apellidoErr = "El apellido es requerido";
-          } else {
-            $apellido = test_input($_POST["apellido"]);
-            // check if name only contains letters and whitespace
-            if (!preg_match("/^[a-zA-Z-' ]*$/",$apellido)) {
-              $apellidoErr = "Sólo se admiten letras y espacios en blanco";
-            }
-          }
-
-          if (empty($_POST["correo"])) {
-            $correoErr = "El correo es requerido";
-          } else {
-            $correo = test_input($_POST["correo"]);
-            // check if e-mail address is well-formed
-            if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-              $correoErr = "Formato de correo inválido";
-            }
-          }
-
-          if (empty($_POST["username"])) {
-            $apellidoErr = "El usuario es requerido";
-          } else {
-            $username = test_input($_POST["apellido"]);
-            // check if name only contains letters and whitespace
-            if (!preg_match("/^[a-zA-Z-']*$/",$username)) {
-              $usernameErr = "Sólo se admiten letras";
-            }
-          }
-      
-          if(!empty($_POST["password"])) {
-            $password = test_input($_POST["password"]);
-            if (strlen($_POST["password"]) <= '8') {
-                $passwordErr = "La contraseña debe tener al menos 8 dígitos";
-            }
-            elseif(!preg_match("#[0-9]+#",$password)) {
-                $passwordErr = "La contraseña debe tener al menos 1 número";
-            }
-            elseif(!preg_match("#[A-Z]+#",$password)) {
-                $passwordErr = "La contraseña debe tener al menos 1 caracter en mayúscula";
-            }
-            elseif(!preg_match("#[a-z]+#",$password)) {
-                $passwordErr = "La contraseña debe tener al menos 1 caracter en minúscula";
-            }
-           }
-           else if(!empty($_POST["password"])) {
-               $cpasswordErr = "Please Check You've Entered Or Confirmed Your Password!";
-           } else {
-                $passwordErr = "Debe de ingresar una constraseña";
-           }
-      
-          if (empty($_POST["userType"])) {
-            $userTypeErr = "Seleccione un tipo de usuario";
-          } else {
-            $userType = test_input($_POST["userType"]);
-          }
-        }
-
-        function test_input($data) {
-          $data = trim($data);
-          $data = stripslashes($data);
-          $data = htmlspecialchars($data);
-          return $data;
-        }
-        ?>
-
         <!-- Forma de Registro -->
         <section class="gradient-form">
             <div class="container py-5">
@@ -131,63 +152,80 @@
                             <div class="justify-content-center align-items-center row g-0">
                                 <div class="col-lg-8">
                                     <div class="card-body p-md-5 mx-md-4">
-                                        <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" enctype="multipart/form-data">
+                                        <form method="POST" autocomplete="off" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                                             <div class="form-outline mb-4">
                                               <label class="form-label" for="nombre">Nombre(s): </label>
-                                              <span class="error"> * <?php echo $nombreErr;?></span>
-                                              <input type="text" id="nombre" name="nombre" class="form-control" value="<?php echo $nombre;?>" required>
+                                              <span class="error"> *</span>
+                                              <input type="text" id="nombre" name="nombre" class="form-control" required>
                                             </div>
                                             <div class="form-outline mb-4">
                                                 <label class="form-label" for="apellido">Apellidos: </label>
-                                                <span class="error"> * <?php echo $apellidoErr;?></span>
-                                                <input type="text" id="apellido" name="apellido" class="form-control" value="<?php echo $apellido;?>" required>
+                                                <span class="error"> *</span>
+                                                <input type="text" id="apellido" name="apellido" class="form-control" required>
                                             </div>
                                             <div class="form-outline mb-4">
                                                 <label class="form-label" for="fecha">Fecha de Nacimiento: </label>
-                                                <input type="date" id="fecha" name="fecha" class="form-control">
+                                                <span class="error"> *</span>
+                                                <input type="date" id="fecha" name="fecha" class="form-control" required>
                                             </div>
                                             <div class="form-outline mb-4">
                                               <label class="form-label" for="correo">Correo Electrónico: </label>
-                                              <span class="error"> * <?php echo $correoErr;?></span>
-                                              <input type="email" id="correo" name="correo" class="form-control" value="<?php echo $correo;?>" required>
+                                              <span class="error"> *</span>
+                                              <input type="email" id="correo" name="correo" class="form-control" required>
                                             </div>
                                             <div class="form-outline mb-4">
                                                 <label class="form-label" for="imagen">Imagen de Perfil: </label>
-                                                <input type="file" id="imagen" name="imagen" class="form-control">
+                                                <span class="error"> *</span>
+                                                <input type="file" id="imagen" name="imagen" class="form-control" required>
                                             </div>
                                             <div class="form-outline mb-4">
                                                 <label class="form-label" for="username">Nombre de Usuario: </label>
-                                                <span class="error"> * <?php echo $usernameErr;?></span>
-                                                <input type="text" id="username" name="username" class="form-control" value="<?php echo $username;?>" required>
+                                                <span class="error"> *</span>
+                                                <input type="text" id="username" name="username" class="form-control" required>
                                             </div>
                                             <div class="form-outline mb-4">
                                                 <label class="form-label" for="password">Contraseña: </label>
-                                                <span class="error"> * <?php echo $passwordErr;?></span>
-                                                <input type="password" id="password" name="password" class="form-control" value="<?php echo $password;?>" required>
+                                                <span class="error"> *</span>
+                                                <input type="password" id="password" name="password" class="form-control" required>
                                             </div>
                                             <div class="form-outline mb-4">
                                               <label class="form-label" for="password2">Confirmar Contraseña: </label>
+                                              <span class="error"> *</span>
                                               <input type="password" id="password2" name="password2" class="form-control" required>
                                             </div>
+
+
                                             <p class="mb-2">Tipo de Usuario:</p>
                                             <div class="form-check form-check-inline mb-2">
-                                                <input class="form-check-input" type="radio" name="userType" id="userType1" value="Comprador" checked>
+                                                <input class="form-check-input" type="radio" name="tipousuario" id="userType1" value="1" checked>
                                                 <label class="form-check-label" for="userType1">Comprador</label>
                                             </div>
-                                            <div class="form-check form-check-inline mb-4">
-                                                <input class="form-check-input" type="radio" name="userType" id="userType2" value="Vendedor">
+                                            <div class="form-check form-check-inline mb-2">
+                                                <input class="form-check-input" type="radio" name="tipousuario" id="userType2" value="2">
                                                 <label class="form-check-label" for="userType2">Vendedor</label>
                                             </div>
+                                            <div class="form-check form-check-inline mb-2">
+                                                <input class="form-check-input" type="radio" name="tipousuario" id="userType3" value="3">
+                                                <label class="form-check-label" for="userType3">Administrador</label>
+                                            </div>
+
+                                            <!--<div class="form-group my-4 d-flex">
+                                              <label for="captcha" class="col-md-3 control-label"></label>
+                                              <div class="g-recaptcha col-md-9" data-sitekey="6LdRTT0jAAAAAMBuKKf_-fLbRtNvqdK5tHruVzi5"></div>
+                                            </div>-->
+
                                             <div class="text-center">
-                                                <input class="btn btn-block fa-lg btn-lg accent-bg-color mb-4" type="submit" name="submit" value="Registrar">  
-                                                <input class="btn btn-block fa-lg btn-lg accent-bg-color mb-4" type="submit" value="Entrar" onclick="parent.location='home.php'">
+                                                <button class="btn btn-block fa-lg btn-lg accent-bg-color my-4" type="submit" name="submit">Registrarse</button>
                                             </div>
           
-                                            <div class="d-flex align-items-center justify-content-center pb-3">
-                                              <p class="mb-0 me-2">¿Ya tienes una cuenta?</p>
-                                              <button type="button" onclick="parent.location='login.php'" class="btn btn-outline-primary">Iniciar Sesión</button>
+                                            <div class="text-center pb-3">
+                                              <div class="mb-0 me-2">¿Ya tienes una cuenta?</div>
+                                              <button type="button" onclick="parent.location='login.php'" class="btn btn-outline-primary mt-2">Iniciar Sesión</button>
                                             </div>
                                         </form>
+                                        <?php 
+                                          echo resultBlock($errors);
+                                        ?>
                                     </div>
                                 </div>
                             </div>

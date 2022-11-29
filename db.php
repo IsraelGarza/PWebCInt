@@ -1,31 +1,47 @@
-<?php 
-    class connect
-    {
-        public $host;
-        public $db;
-        public $user;
-        public $password;
-        public $charset;
-        public $con;
-
-        public function _construct()
-        {
-            $this->host = 'localhost';
-            $this->db = 'comprasmx';
-            $this->user = 'root';
-            $this->password = '';
-            $this->con = new mysqli($this->host, $this->user, $this->password, $this->db);
-
-            if ($this->con->connect_errno)
-            {
-                echo "Fallo la conexion!";
-            }
-            else
-            {
-                echo "Conexion excitosa!";
-            }
-        }
+<?php
+    $dbhost = "localhost";
+    $dbuser = "root";
+    $dbpass = "";
+    $dbname = "comprasmx";
+    
+    $con = new mysqli($dbhost, $dbuser, $dbpass, $dbname);
+    
+    if (!$con) {
+        die("Connexión fallida: " . mysqli_connect_error());
     }
 
-    $CONNECT = new connect ();
+    /*
+    class Database
+    {
+        private 
+        private 
+        private 
+        private 
+
+        function conectar()
+        {
+            try {
+
+                $server = "localhost";
+                $username = "root";
+                $password = "";
+                $database = "comprasmx";
+
+                $conn = new PDO("mysql:host=$server;dbname=$database;",$username,$password);
+
+                $id = isset($_GET['id']) ? $_GET['id'] : '';
+    $token = isset($_GET['token']) ? $_GET['token'] : '';
+
+    $registro = mostrarProducto($id);
+    $nombre = $registro['nombre'];
+    $precio = $registro['precio'];
+
+                return $con;
+
+            } catch (PDOException $error) {
+                die("Error de conexion: " . $error->getMessage());
+                exit;
+            }
+        }
+    }*/
 ?>

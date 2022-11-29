@@ -1,3 +1,22 @@
+<?php
+
+    session_start();
+
+    if(!isset($_SESSION['userId'])){
+        header("Location: login.php");
+    }
+
+    $username = $_SESSION['username'];
+    $nombre = $_SESSION['nombre'];
+    $apellidos = $_SESSION['apellidos'];
+    $fechaNac = $_SESSION['fechaNac'];
+    $correo = $_SESSION['correo'];
+    $imagen = $_SESSION['imagen'];
+    $pass = $_SESSION['pass'];
+    $tipousuario = $_SESSION['tipousuario'];
+
+?>
+
 <!DOCTYPE html>
 <html lang="es-MX">
     <head>
@@ -25,16 +44,22 @@
 
                 <div class="collapse navbar-collapse" id="navmenu">
                     <ul class="navbar-nav ms-auto text-center">
-                        <li class="nav-item">
-                            <a href="/PWebCInt/profile.php" class="nav-link">Perfil</a>
+                    <li class="nav-item">
+                            <a href="profile.php" class="nav-link">Perfil</a>
                         </li>
+                        <?php if($tipousuario == 1 || $tipousuario == 2) {?>
                         <li class="nav-item">
-                            <a href="/PWebCInt/cart.php" class="nav-link">Mi Carrito <span class="badge bg-dark text-white ms-1 rounded-pill">3</span></a>
+                            <a href="cart.php" class="nav-link">Mi Carrito<span class="badge bg-dark text-white ms-1 rounded-pill">3</span></a>
                         </li>
+                        <?php }?>
+                        <?php if($tipousuario == 2) {?>
                         <li class="nav-item">
-                            <a href="/PWebCInt/index.php" class="nav-link">Cerrar Sesión</a>
+                            <a href="cart.php" class="nav-link">Mis Productos</a>
                         </li>
-                    </ul>
+                        <?php }?>
+                        <li class="nav-item">
+                            <a href="logout.php" class="nav-link">Cerrar Sesión</a>
+                        </li>
                 </div>
             </div>
         </nav>
@@ -48,11 +73,26 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="d-flex flex-column align-items-center text-center">
-                                    <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="Admin" class="rounded-circle" width="150">
+                                    <?php 
+                                        echo '<img class="rounded-circle"   width="150" src="data:image/jpeg;base64,'.    base64_encode($imagen).'"/>';
+
+                                        if (empty($imagen)) {
+                                            echo '<img class="card-img-top"         style="width:150px;height:auto"     src="img/   defaultimg.jpg"/>';
+                                            $imagen = "img/defaultimg.jpg";
+                                        }
+                                    ?>
                                     <div class="mt-3">
-                                      <h4>Usuario</h4>
-                                      <p class="text-secondary">Tipo de Usuario: Comprador</p>
-                                      <button class="btn btn-outline-danger my-3">Cerrar Sesión</button>
+                                      <h4><?php echo $username; ?></h4>
+                                      <p class="text-secondary">
+                                        Tipo de Usuario: <?php if($tipousuario == 1){
+                                            echo "Comprador(a)";
+                                        }else if($tipousuario == 2){
+                                            echo "Vendedor(a)";
+                                        }else if($tipousuario == 3){
+                                            echo "Administrador(a)";
+                                        }else
+                                            echo "ERROR"?></p>
+                                      <a class="btn btn-outline-danger my-3" href="logout.php">Cerrar Sesión</a>
                                     </div>
                                 </div>
                             </div>
@@ -60,7 +100,7 @@
                     </div>
 
                     <!-- Tabla Datos Personales -->
-                    <div class="col-md-8">
+                    <div class="col-md-8 mb-5">
                         <div class="card mb-4">
                             <div class="card-body">
                                 <div class="row">
@@ -68,7 +108,7 @@
                                         <h6 class="mb-0">Nombre(s)</h6>
                                     </div>
                                     <div class="col-sm-9 text-secondary">
-                                        Kenneth Ronaldo
+                                        <?php echo $nombre; ?>
                                     </div>
                                 </div>
                                 <hr>
@@ -77,7 +117,7 @@
                                         <h6 class="mb-0">Apellidos</h6>
                                     </div>
                                     <div class="col-sm-9 text-secondary">
-                                        Valdez Zúñiga
+                                        <?php echo $apellidos; ?>
                                     </div>
                                 </div>
                                 <hr>
@@ -86,7 +126,7 @@
                                         <h6 class="mb-0">Fecha de Nacimiento</h6>
                                     </div>
                                     <div class="col-sm-9 text-secondary">
-                                        10 / Noviembre / 1999
+                                        <?php echo $fechaNac; ?>
                                     </div>
                                 </div>
                                 <hr>
@@ -95,16 +135,7 @@
                                         <h6 class="mb-0">Correo</h6>
                                     </div>
                                     <div class="col-sm-9 text-secondary">
-                                        kenrvz99@outlook.com
-                                    </div>
-                                </div>
-                                <hr>
-                                <div class="row">
-                                    <div class="col-sm-3">
-                                        <h6 class="mb-0">Imagen</h6>
-                                    </div>
-                                    <div class="col-sm-9 text-secondary">
-                                        imagen_perfil.png
+                                        <?php echo $correo; ?>
                                     </div>
                                 </div>
                                 <hr>
@@ -113,13 +144,13 @@
                                         <h6 class="mb-0">Contraseña</h6>
                                     </div>
                                     <div class="col-sm-9 text-secondary">
-                                        Blablabla85
+                                        <?php echo $pass; ?>
                                     </div>
                                 </div>
                                 <hr>
                                 <div class="row">
                                     <div class="col-sm-12">
-                                      <a class="btn accent-bg-color " target="__blank" href="https://www.bootdey.com/snippets/view/ profile-edit-data-and-skills">Editar datos</a>
+                                      <a class="btn accent-bg-color " target="__blank" href="https://www.bootdey.com/snippets/view/profile-edit-data-and-skills">Editar datos</a>
                                     </div>
                                 </div>
                             </div>

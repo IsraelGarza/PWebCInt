@@ -10,7 +10,5 @@ function getInfo() {
 
     if(validar == 1) {
         alert("Error al iniciar sesión.");
-    } else {
-        alert("Haz iniciado sesión.\nTu nombre es " + username + " y tu contraseña es " + password + ".");
     }
 }

@@ -1,3 +1,22 @@
+<?php
+
+    session_start();
+
+    if(!isset($_SESSION['userId'])){
+        header("Location: login.php");
+    }
+
+    $username = $_SESSION['username'];
+    $nombre = $_SESSION['nombre'];
+    $apellidos = $_SESSION['apellidos'];
+    $fechaNac = $_SESSION['fechaNac'];
+    $correo = $_SESSION['correo'];
+    $imagen = $_SESSION['imagen'];
+    $pass = $_SESSION['pass'];
+    $tipousuario = $_SESSION['tipousuario'];
+
+?>
+
 <!DOCTYPE html>
 <html lang="es-MX">
     <head>
@@ -25,14 +44,24 @@
 
                 <div class="collapse navbar-collapse" id="navmenu">
                     <ul class="navbar-nav ms-auto text-center">
+                    <li class="nav-item">
+                            <a href="profile.php" class="nav-link">Perfil</a>
+                        </li>
+                        <?php if($tipousuario == 1 || $tipousuario == 2) {?>
                         <li class="nav-item">
-                            <a href="/PWebCInt/profile.php" class="nav-link">Perfil</a>
+                            <a href="cart.php" class="nav-link">Mi Carrito<span class="badge bg-dark text-white ms-1 rounded-pill">3</span></a>
                         </li>
                         <li class="nav-item">
-                            <a href="/PWebCInt/cart.php" class="nav-link">Mi Carrito <span class="badge bg-dark text-white ms-1 rounded-pill">3</span></a>
+                            <a href="listas.php" class="nav-link">Mis Listas</a>
                         </li>
+                        <?php }?>
+                        <?php if($tipousuario == 2) {?>
                         <li class="nav-item">
-                            <a href="/PWebCInt/index.php" class="nav-link">Cerrar Sesión</a>
+                            <a href="myproducts.php" class="nav-link">Mis Productos</a>
+                        </li>
+                        <?php }?>
+                        <li class="nav-item">
+                            <a href="logout.php" class="nav-link">Cerrar Sesión</a>
                         </li>
                     </ul>
                 </div>
@@ -55,50 +84,112 @@
                                         <hr class="my-4">
 
                                         <div class="row mb-4 d-flex justify-content-between align-items-center">
-                                            <div class="col-md-2">
+                                            <div class="col-md-3">
                                               <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-shopping-carts/img5.webp"
                                                 class="img-fluid rounded-3" alt="imgProducto">
                                             </div>
-                                            <div class="col-md-2">
+                                            <div class="col-md-3">
                                                 <h6 class="text-muted">Categoria</h6>
                                                 <h6 class="mb-0">Producto 1</h6>
                                             </div>
-                                            <div class="col-md-4">
+
+                                            <div class="col-md d-flex">
+                                                <button class="btn accent-bg-color btn-link px-1 mx-2"
+                                                  onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                                                  <i class="bi bi-dash"></i>
+                                                </button>
+
+                                                <input id="form1" min="0" name="quantity" value="1" type="number"
+                                                  class="form-control form-control-sm px-1" />
+
+                                                <button class="btn accent-bg-color btn-link px-1 mx-2"
+                                                  onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                                                  <i class="bi bi-plus"></i>
+                                                </button>
+                                            </div>
+                                            <div class="col-md">
                                                 <h6 class="mb-0">$120.00 MXN</h6>
+                                            </div>
+
+                                            <div class="col-md">
+                                                <i class="bi bi-trash-fill"></i>
                                             </div>
                                         </div>
                                         <hr class="my-4">
 
                                         <div class="row mb-4 d-flex justify-content-between align-items-center">
-                                            <div class="col-md-2">
+                                            <div class="col-md-3">
                                               <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-shopping-carts/img5.webp"
                                                 class="img-fluid rounded-3" alt="imgProducto">
                                             </div>
-                                            <div class="col-md-2">
+                                            <div class="col-md-3">
                                                 <h6 class="text-muted">Categoria</h6>
                                                 <h6 class="mb-0">Producto 2</h6>
                                             </div>
-                                            <div class="col-md-4">
+
+                                            <div class="col-md d-flex">
+                                                <button class="btn accent-bg-color btn-link px-1 mx-2"
+                                                  onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                                                  <i class="bi bi-dash"></i>
+                                                </button>
+
+                                                <input id="form1" min="0" name="quantity" value="1" type="number"
+                                                  class="form-control form-control-sm px-1" />
+
+                                                <button class="btn accent-bg-color btn-link px-1 mx-2"
+                                                  onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                                                  <i class="bi bi-plus"></i>
+                                                </button>
+                                            </div>
+                                            <div class="col-md">
                                                 <h6 class="mb-0">$600.00 MXN</h6>
+                                            </div>
+
+                                            <div class="col-md">
+                                                <i class="bi bi-trash-fill"></i>
                                             </div>
                                         </div>
                                         <hr class="my-4">
 
                                         <div class="row mb-4 d-flex justify-content-between align-items-center">
-                                            <div class="col-md-2">
+                                            <div class="col-md-3">
                                               <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-shopping-carts/img5.webp"
                                                 class="img-fluid rounded-3" alt="imgProducto">
                                             </div>
-                                            <div class="col-md-2">
+                                            <div class="col-md-3">
                                                 <h6 class="text-muted">Categoria</h6>
                                                 <h6 class="mb-0">Producto 3</h6>
                                             </div>
-                                            <div class="col-md-4">
+
+                                            <div class="col-md d-flex">
+                                                <button class="btn accent-bg-color btn-link px-1 mx-2"
+                                                  onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                                                  <i class="bi bi-dash"></i>
+                                                </button>
+
+                                                <input id="form1" min="0" name="quantity" value="1" type="number"
+                                                  class="form-control form-control-sm px-1" />
+
+                                                <button class="btn accent-bg-color btn-link px-1 mx-2"
+                                                  onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                                                  <i class="bi bi-plus"></i>
+                                                </button>
+                                            </div>
+                                            <div class="col-md">
                                                 <h6 class="mb-0">$270.00 MXN</h6>
+                                            </div>
+
+                                            <div class="col-md">
+                                                <i class="bi bi-trash-fill"></i>
                                             </div>
                                         </div>
                                         <div>
-                                        <button type="button" class="btn accent-bg-color btn-block btn-lg">Comprar</button>
+                                            <button type="button" class="btn accent-bg-color btn-block btn-lg" onclick="parent.location='venta.php'">
+                                                <div class="d-flex justify-content-between">
+                                                    <span>Pagar</span>
+                                                    <span class="ms-2">($990.00 MXN)</span>
+                                                </div>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
